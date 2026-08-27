@@ -1,5 +1,16 @@
 # 📌Instant Speed-to-Lead Alert & CRM Ingestion
 
+
+
+Real-time n8n pipeline that captures form submissions, normalizes lead data, syncs to a Google Sheets CRM, and alerts sales on Slack within seconds—so no high-intent lead sits unattended.
+
+- 0-second ingestion latency from form to CRM + Slack alert
+- 100% data normalization (trimmed, lowercased, safe for missing fields)
+- Enforces a 5-minute SLA for sales follow-up on new leads
+
+**Stack:** n8n + Webhooks + Google Sheets + Slack
+---
+
 ## 📹 Demo Walkthrough
 Watch the 4-minute live walkthrough of the automated pipeline:
 [Watch Automated CRM Lead Ingestion Demo on Loom](https://www.loom.com/share/707c78cf35df44a4adf3ee1a04d75b57)
