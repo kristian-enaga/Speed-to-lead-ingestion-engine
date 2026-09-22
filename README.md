@@ -1,49 +1,82 @@
-# 📌 Instant Speed-to-Lead Alert & CRM Ingestion
+# 📌 Instant Speed-to-Lead Alert & CRM Ingestion Engine
 
-Real-time n8n pipeline that captures lead form submissions, enforces pre-flight schema validation, upserts contacts into HubSpot CRM with automated retry/DLQ failovers, and alerts sales on Slack within seconds—eliminating dropped leads and data corruption.
+Production-grade n8n pipeline that turns raw lead form submissions into clean CRM records and instant Slack sales alerts—so revenue teams contact high-intent buyers in seconds without losing leads or corrupting databases.
 
-- **0-Second Latency:** Instant ingestion from webhook capture to CRM upsert and Slack alert.
-- **Pre-flight Schema Gate:** Normalizes lead data, trims whitespace, lowercases emails, and validates email/name payloads prior to downstream routing.
-- **Fault-Tolerant CRM Sync:** Direct HubSpot contact upsert with 3x auto-retries and Dead Letter Queue (DLQ) failover on 4xx/5xx API drops.
-- **5-Minute Sales SLA:** Posts formatted urgency alerts to `#new-leads` with direct contact metadata.
+- 0-second lead ingestion latency to enforce a strict 5-minute sales response SLA
+- 100% CRM data hygiene via pre-flight schema gates and automated contact normalization
+- Zero-downtime fault tolerance with automatic retries and Dead Letter Queue (DLQ) failover vault
 
 **Stack:** n8n + Webhooks + HubSpot API + Google Sheets (DLQ & Quarantine) + Slack API
 
 ---
 
-## 📹 Demo Walkthrough
+[![Loom Video Walkthrough](https://img.shields.io/badge/Loom-Watch%20Video%20Walkthrough-6667AB?style=for-the-badge&logo=loom&logoColor=white)](https://www.loom.com/share/707c78cf35df44a4adf3ee1a04d75b57)
 
-Watch the 4-minute live walkthrough of the automated pipeline:
-[Watch Automated CRM Lead Ingestion Demo on Loom](https://www.loom.com/share/707c78cf35df44a4adf3ee1a04d75b57)
+![Workflow Architecture](./Speed-to-lead-archictecture.png)
 
-![Workflow Architecture](./Speed-lead.png)
+An automated, fault-tolerant lead processing engine built with **n8n**, **Webhooks**, **HubSpot API**, **Google Sheets**, and **Slack**.
+
+> 🎬 **Video Demo:** Watch the full architecture and fail-safe walkthrough on [Loom](https://www.loom.com/share/707c78cf35df44a4adf3ee1a04d75b57).
+
+---
 
 ## 🎯 Business Problem
 
-When a prospective client fills out a lead form, response speed dictates conversion. Studies show that waiting even 10 minutes drops closing rates by over 400%. Manual data entry, unvalidated contact payloads, and silent API drops cause corrupt CRM databases and lost pipeline revenue.
+When a prospective buyer fills out an inquiry form, response speed dictates conversion rate. Studies show that waiting even 10 minutes to follow up drops closing rates by over 400%. Manual data entry, unvalidated contact payloads, and silent API drops cause corrupt CRM databases, missed SLAs, and lost pipeline revenue.
 
-## 🚀 The Solution
+## 🚀 Solution Overview
 
-An enterprise-grade, fault-tolerant lead processing pipeline built in n8n:
+This production-grade n8n workflow automates end-to-end lead ingestion while enforcing complete data integrity:
 
-1. **Webhook Capture:** Ingests form submissions instantly with zero latency.
-2. **Pre-flight Schema Gate (`NormalizeAndValidateLeadData`):** Cleans whitespace, lowercases emails, validates schema (`isValidEmail` & `isNamePresent`), and standardizes properties (`LeadName`, `LeadEmail`, `LeadPhone`, `LeadInquiry`, `processedAt`).
-3. **Validation & Quarantine (`Validation: Email` / `No Email/Name`):** Routes valid payloads to production CRM sync; quarantine logs invalid schema leads with `SKIPPED_INVALID_SCHEMA` status for sales audit.
-4. **HubSpot CRM Upsert (`Hubspot_Upsert Contact`):** Upserts contact records using `LeadEmail` as the unique lookup key. Configured with 3 retries (5s wait) and `On Error: Continue` error output routing.
-5. **Dead Letter Queue (`DLQ_Backup_Log`):** Catches 4xx/5xx failures from HubSpot and Slack API endpoints, preserving contact context and logging execution metadata (`$json.node.name`, `$json.error.message`, `$now`, `$execution.id`).
-6. **Instant Sales Urgency Alert (`SlackInstantAlert`):** Posts formatted Markdown alerts to `#new-leads` enforcing a target 5-minute sales response window.
-
-## 🧪 Live Execution Proof & SLA Verification
-
-Here is the verified execution log confirming instant lead ingestion, data normalization, database synchronization, and Slack alerting.
-
-### 1. Successful n8n Ingestion Execution Log
-
-![n8n Speed to Lead Execution History](./speed-to-lead-execution-history.png)
-*Figure 1: Verified n8n execution history demonstrating 0-second ingestion latency across all pipeline nodes.*
+1. **Ingest & Validate (`NormalizeAndValidateLeadData`):** Webhook captures POST payloads instantly; pre-flight schema gate trims whitespace, lowercases emails, and validates email/name format.
+2. **Quarantine Routing (`No Email/Name`):** Isolates malformed or incomplete inquiries into a dedicated Google Sheets log (`SKIPPED_INVALID_SCHEMA`) without crashing execution.
+3. **HubSpot CRM Sync (`Hubspot_Upsert Contact`):** Upserts contact records using `LeadEmail` as the unique lookup key, backed by 3x auto-retries (5s wait).
+4. **Dead Letter Queue (`DLQ_Backup_Log`):** Traps 4xx/5xx API drops from HubSpot or Slack, logging node name, error message, timestamp, and execution ID for zero data loss.
+5. **Instant Sales Alert (`SlackInstantAlert`):** Pushes formatted Markdown alerts to `#new-leads` enforcing a target 5-minute sales response window.
 
 ## 💰 Business Impact & ROI
 
-* **0-Second Lead Ingestion:** Eliminates response latency and secures maximum speed-to-lead conversion rates.
-* **Zero Data Loss Architecture:** DLQ and quarantine logging guarantee no prospect payload is lost due to third-party API downtime or malformed user input.
-* **100% CRM Hygiene:** Prevents duplicate and corrupt contact creation through strict normalization and email key matching.
+* **⚡ 0-Second Lead Ingestion:** Eliminates response latency completely, enabling reps to hit leads while buy-intent is at its peak.
+* **🔒 100% CRM Data Hygiene:** Pre-flight schema validation blocks missing emails, uncleaned names, and duplicate records at the door.
+* **🛡️ Zero-Data-Loss Vault:** Dead Letter Queue (DLQ) captures third-party API drops and network timeouts so no prospect payload is lost.
+
+---
+
+## 🧪 Live Execution Proof & Verification
+
+### 1. Workflow Execution History
+![n8n Speed to Lead Execution History](./speed-to-lead-exec-log.png)
+*Figure 1: Verified n8n execution log confirming 0-second ingestion latency across all pipeline nodes.*
+
+### 2. HubSpot Contact Upsert Payload
+![HubSpot Input Payload](./hubspot-input-payload.png)
+*Figure 2: Verified sanitized lead contact payload synced directly into HubSpot CRM.*
+
+### 3. Real-Time Slack Sales Alert
+![Slack Sales Notification](./slack-notif-leads.png)
+*Figure 3: Formatted markdown alert pushed instantly to `#new-leads` for sales follow-up.*
+
+---
+
+## ⚙️ How to Deploy & Setup
+
+### 1. Import Blueprint
+1. Copy the workflow JSON from the repository.
+2. Open your n8n instance, click **Workflows** -> **Import from File / JSON**, and paste the blueprint.
+
+### 2. Configure Credentials & Connections
+* **Webhook Trigger:** Set path to `capture-lead` (HTTP Method: `POST`).
+* **HubSpot API:** Connect your HubSpot OAuth2 / Access Token credential for contact upserts.
+* **Google Sheets (DLQ & Quarantine):** Select target Spreadsheet ID for `DLQ_Backup_Log` and `No Email/Name` quarantine logs.
+* **Slack API:** Connect Slack OAuth2 credential and set channel target to `#new-leads`.
+
+### 3. Test Payload Execution
+Send a test POST request to your webhook endpoint:
+
+```json
+{
+  "LeadName": "John Doe",
+  "LeadEmail": "john.doe@example.com",
+  "LeadPhone": "+1234567890",
+  "LeadInquiry": "Interested in enterprise automation pipeline."
+}
