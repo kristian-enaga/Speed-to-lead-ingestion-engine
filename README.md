@@ -80,11 +80,12 @@ Send a test POST request to your webhook endpoint:
   "LeadPhone": "+1234567890",
   "LeadInquiry": "Interested in enterprise automation pipeline."
 }
-
+```
 
 ---
+📈 Engineering Roadmap & Milestone
+Roadmap Phase: Phase 2 (Automation Engineering)
 
-### 📈 Engineering Roadmap & Milestone
-* **Roadmap Phase:** Phase 2 (Automation Engineering)
-* **Sprint Tracker:** Sprint 2 — API Integration & Error Workflows
-* **Build Milestone:** Completed (Day 42/153)
+Sprint Tracker: Sprint 2 — API Integration & Error Workflows
+
+Build Milestone: Completed (Day 42/153)
